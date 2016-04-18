@@ -145,7 +145,7 @@ func (m *Msg) parseParams() (err error) {
 	var n int
 	b := m.Data[m.index:]
 	// find trailing
-	n = bytes.LastIndexByte(b, prefixSymbol)
+	n = bytes.IndexByte(b, prefixSymbol)
 	if n < 0 {
 		// No trailing
 		n = len(b) - 1
