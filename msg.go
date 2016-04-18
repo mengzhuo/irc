@@ -28,6 +28,7 @@ type Msg struct {
 	index        int
 }
 
+// Prefix
 func (m *Msg) Name() []byte {
 	m.parsePrefix()
 	return m.name
@@ -43,13 +44,25 @@ func (m *Msg) Host() []byte {
 	return m.host
 }
 
-func (m *Msg) Params() [][]byte {
+func (m *Msg) IsHostMask() bool {
 	m.parsePrefix()
+	return m.host != nil && m.user != nil
+}
+
+func (m *Msg) IsServer() bool {
+	m.parsePrefix()
+	return m.user == nil && m.host == nil
+}
+
+// Params
+
+func (m *Msg) Params() [][]byte {
+	m.parseParams()
 	return m.params
 }
 
 func (m *Msg) Trailing() []byte {
-	m.parsePrefix()
+	m.parseParams()
 	return m.trailing
 }
 
