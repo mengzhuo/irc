@@ -35,6 +35,18 @@ var messageTests = [...]*struct {
 			host:     nil,
 			params:   [][]byte{s2b("cm22.eng.umd.edu")},
 		},
+		false,
+		true,
+	},
+	{
+		":WiZ!jto@tolsun.oulu.fi PART #playzone :I lost",
+		&Msg{cmd: s2b("PART"),
+			trailing: s2b("I lost"),
+			name:     s2b("WiZ"),
+			user:     s2b("jto"),
+			host:     s2b("tolsun.oulu.fi"),
+			params:   [][]byte{s2b("#playzone")},
+		},
 		true,
 		false,
 	},
@@ -95,6 +107,7 @@ func TestMsgTrailing(t *testing.T) {
 		}
 	}
 }
+
 func TestMsgParams(t *testing.T) {
 	for _, z := range messageTests {
 		m, err := NewMsg(s2b(z.rawMsg))
@@ -104,6 +117,26 @@ func TestMsgParams(t *testing.T) {
 			for i := 0; i < len(p.params); i++ {
 				bytes.Equal(p.params[i], m.params[i])
 			}
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
+		}
+	}
+}
+
+func TestMsgServer(t *testing.T) {
+	for _, z := range messageTests {
+		m, err := NewMsg(s2b(z.rawMsg))
+		m.ParseAll()
+		if err != nil || m.IsServer() != z.server {
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
+		}
+	}
+}
+
+func TestMsgHostMask(t *testing.T) {
+	for _, z := range messageTests {
+		m, err := NewMsg(s2b(z.rawMsg))
+		m.ParseAll()
+		if err != nil || m.IsHostMask() != z.hostmask {
 			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
