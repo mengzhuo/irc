@@ -6,110 +6,171 @@ import (
 	"fmt"
 )
 
+const (
+	prefixSymbol byte = 0x3a // Prefix Symbol
+	userSymbol   byte = 0x21 // Username
+	hostSymbol   byte = 0x40 // Hostname
+	space        byte = 0x20 // Sepector
+)
+
 type Msg struct {
-	Data         []byte
-	Prefix       []byte
-	Cmd          []byte
-	Params       [][]byte
-	Trailing     []byte
-	parsedCmd    bool
-	parsedParams bool
+	Data     []byte
+	prefix   []byte
+	name     []byte
+	user     []byte
+	host     []byte
+	cmd      []byte
+	params   [][]byte
+	trailing []byte
+
+	prefixParsed bool
+	paramsParsed bool
 	index        int
 }
 
-func NewMsg(b []byte) (m *Msg) {
+func (m *Msg) Name() []byte {
+	m.parsePrefix()
+	return m.name
+}
+
+func (m *Msg) User() []byte {
+	m.parsePrefix()
+	return m.user
+}
+
+func (m *Msg) Host() []byte {
+	m.parsePrefix()
+	return m.host
+}
+
+func (m *Msg) Params() [][]byte {
+	m.parsePrefix()
+	return m.params
+}
+
+func (m *Msg) Trailing() []byte {
+	m.parsePrefix()
+	return m.trailing
+}
+
+func (m *Msg) Cmd() []byte {
+	return m.cmd
+}
+
+func NewMsg(b []byte) (m *Msg, err error) {
 	m = new(Msg)
 	m.Data = b
+	err = m.PeekCmd()
 	return
 }
 
-func (m *Msg) parseAll() (err error) {
-
-	err = m.parseCmd()
-	if err != nil {
-		return
-	}
-	err = m.parseParams()
-	return
-}
-
-func (m *Msg) parseCmd() (err error) {
-	var n int
-	if m.parsedCmd {
-		return
-	}
+func (m *Msg) PeekCmd() (err error) {
 
 	b := m.Data
+	var n int
+
 	if m.hasPrefix() {
-		n = bytes.IndexByte(b, ' ')
+		n = bytes.IndexByte(b, space)
 		if n <= 0 {
 			err = errors.New("can't get cmd")
 			return
 		} else {
-			m.Prefix = b[:n]
+			m.prefix = b[1:n]
 			m.index = n
 			b = b[n+1:]
 		}
 	}
 
-	n = bytes.IndexByte(b, ' ')
+	n = bytes.IndexByte(b, space)
 	if n < 0 {
 		// no params
-		m.Cmd = b
+		m.cmd = b
 		m.index = m.index + len(b) + 1
 	} else {
-		m.Cmd = b[:n]
+		m.cmd = b[:n]
 		m.index += n + 1
 	}
 
-	m.parsedCmd = true
 	return err
 }
 
-func (m *Msg) parseParams() (err error) {
-	var n int
-	if m.parsedParams {
+func (m *Msg) parsePrefix() (err error) {
+
+	if m.prefixParsed {
 		return
 	}
+	user := bytes.IndexByte(m.prefix, userSymbol)
+	host := bytes.IndexByte(m.prefix, hostSymbol)
+
+	switch {
+	case user > 0 && host > user:
+		m.name = m.prefix[:user]
+		m.user = m.prefix[user+1 : host]
+		m.host = m.prefix[host+1:]
+
+	case user > 0:
+		m.name = m.prefix[:user]
+		m.user = m.prefix[user+1:]
+
+	case host > 0:
+		m.name = m.prefix[:host]
+		m.host = m.prefix[host+1:]
+	}
+
+	m.prefixParsed = true
+	return
+}
+
+func (m *Msg) parseParams() (err error) {
+
+	if m.paramsParsed {
+		return
+	}
+
+	var n int
 	b := m.Data[m.index:]
 	// find trailing
-	n = bytes.LastIndexByte(b, ':')
+	n = bytes.LastIndexByte(b, prefixSymbol)
 	if n < 0 {
 		// No trailing
 		n = len(b) - 1
 	} else {
-		m.Trailing = b[n:]
-		b = b[:n]
+		m.trailing = b[n+1:]
+		if b[0] == space {
+			b = b[1:n]
+		} else {
+			b = b[:n]
+		}
 	}
 
 	for {
-		n = bytes.IndexByte(b, ' ')
+		n = bytes.IndexByte(b, space)
 		if n < 0 {
 			break
 		}
-		m.Params = append(m.Params, b[:n])
+		m.params = append(m.params, b[:n])
 		b = b[n+1:]
 	}
 
-	m.parsedParams = true
+	m.paramsParsed = true
 	return
 }
 
 func (m *Msg) hasPrefix() bool {
-	return m.Data[0] == ':'
+	return m.Data[0] == prefixSymbol
 }
 
 func (m *Msg) String() string {
 	return fmt.Sprintf("CMD:%s, Params:%s, Prefix=%s Trailing=%s",
-		m.Cmd, m.Params, m.Prefix, m.Trailing)
+		m.cmd, m.params, m.prefix, m.trailing)
 }
 
 func (m *Msg) Reset() {
 	m.Data = nil
-	m.Prefix = nil
-	m.Cmd = nil
-	m.Params = nil
-	m.Trailing = nil
-	m.parsedParams = false
-	m.parsedCmd = false
+	m.prefix = nil
+	m.cmd = nil
+	m.params = nil
+	m.trailing = nil
+	m.paramsParsed = false
+	m.prefixParsed = false
 }

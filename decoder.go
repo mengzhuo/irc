@@ -18,11 +18,12 @@ func (d *Decoder) Decode(msg *Msg) (err error) {
 
 	for d.scanner.Scan() {
 		msg.Reset()
-		copy(d.scanner.Bytes(), msg.Data)
-		err = msg.parseAll()
+		msg.Data = d.scanner.Bytes()[:]
+		err = msg.PeekCmd()
 		if err != nil {
 			return err
 		}
+		break
 	}
 
 	if d.scanner.Err() != nil {
