@@ -79,8 +79,8 @@ func NewMsg(b []byte) (m *Msg, err error) {
 
 func (m *Msg) PeekCmd() (err error) {
 
-	b := m.Data
 	var n int
+	b := m.Data
 
 	if m.hasPrefix() {
 		n = bytes.IndexByte(b, space)
@@ -169,6 +169,13 @@ func (m *Msg) parseParams() (err error) {
 	return
 }
 
+func (m *Msg) ParseAll() (err error) {
+	err = m.PeekCmd()
+	err = m.parsePrefix()
+	err = m.parseParams()
+	return
+}
+
 func (m *Msg) hasPrefix() bool {
 	return m.Data[0] == prefixSymbol
 }
@@ -183,6 +190,9 @@ func (m *Msg) Reset() {
 	m.prefix = nil
 	m.cmd = nil
 	m.params = nil
+	m.name = nil
+	m.user = nil
+	m.host = nil
 	m.trailing = nil
 	m.paramsParsed = false
 	m.prefixParsed = false
