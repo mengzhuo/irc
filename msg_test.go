@@ -26,6 +26,18 @@ var messageTests = [...]*struct {
 		true,
 		false,
 	},
+	{
+		":Trillian SQUIT cm22.eng.umd.edu :Server out of control",
+		&Msg{cmd: s2b("SQUIT"),
+			trailing: s2b("Server out of control"),
+			name:     s2b("Trillian"),
+			user:     nil,
+			host:     nil,
+			params:   [][]byte{s2b("cm22.eng.umd.edu")},
+		},
+		true,
+		false,
+	},
 }
 
 func TestMsgCmd(t *testing.T) {
@@ -34,7 +46,7 @@ func TestMsgCmd(t *testing.T) {
 		m.ParseAll()
 		p := z.parsed
 		if err != nil || !bytes.Equal(m.cmd, p.cmd) {
-			t.Errorf("failed:%s parsed:%s", z, m.String())
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
 }
@@ -45,7 +57,8 @@ func TestMsgPrefixName(t *testing.T) {
 		m.ParseAll()
 		p := z.parsed
 		if err != nil || !bytes.Equal(m.name, p.name) {
-			t.Errorf("failed:%s parsed:%s", z, m.String())
+			t.Errorf("failed:%s\nparsed:%s\nm=%s p=%s", z.rawMsg, m.String(),
+				m.name, p.name)
 		}
 	}
 }
@@ -56,7 +69,7 @@ func TestMsgUser(t *testing.T) {
 		m.ParseAll()
 		p := z.parsed
 		if err != nil || !bytes.Equal(m.user, p.user) {
-			t.Errorf("failed:%s parsed:%s", z, m.String())
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
 
@@ -68,7 +81,7 @@ func TestMsgHost(t *testing.T) {
 		m.ParseAll()
 		p := z.parsed
 		if err != nil || !bytes.Equal(m.host, p.host) {
-			t.Errorf("failed:%s parsed:%s", z, m.String())
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
 }
@@ -78,7 +91,7 @@ func TestMsgTrailing(t *testing.T) {
 		m.ParseAll()
 		p := z.parsed
 		if err != nil || !bytes.Equal(m.trailing, p.trailing) {
-			t.Errorf("failed:%s parsed:%s", z, m.String())
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
 }
@@ -91,7 +104,7 @@ func TestMsgParams(t *testing.T) {
 			for i := 0; i < len(p.params); i++ {
 				bytes.Equal(p.params[i], m.params[i])
 			}
-			t.Errorf("failed:%s parsed:%s", z, m.String())
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
 }

@@ -128,6 +128,8 @@ func (m *Msg) parsePrefix() (err error) {
 	case host > 0:
 		m.name = m.prefix[:host]
 		m.host = m.prefix[host+1:]
+	default:
+		m.name = m.prefix
 	}
 
 	m.prefixParsed = true
