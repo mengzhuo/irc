@@ -187,6 +187,30 @@ var messageTests = [...]*struct {
 		false,
 		false,
 	},
+	{
+		":nick PRIVMSG $@ :This message contains a\ttab!",
+		&Msg{cmd: s2b("PRIVMSG"),
+			trailing: s2b("This message contains a\ttab!"),
+			name:     s2b("nick"),
+			user:     nil,
+			host:     nil,
+			params:   [][]byte{s2b("$@")},
+		},
+		false,
+		true, // TODO
+	},
+	{
+		"TEST $@  param :Trailing",
+		&Msg{cmd: s2b("TEST"),
+			trailing: s2b("Trailing"),
+			name:     nil,
+			user:     nil,
+			host:     nil,
+			params:   [][]byte{s2b("$@"), s2b(""), s2b("param")},
+		},
+		false,
+		false,
+	},
 }
 
 func TestMsgCmd(t *testing.T) {
