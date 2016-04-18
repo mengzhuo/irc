@@ -1,6 +1,6 @@
 IRC
 ======================
 
-Fast IRC decode/encode library
+Fast IRC decode/encode library with zero allocation
 
 
