@@ -6,21 +6,23 @@ import (
 )
 
 type Decoder struct {
-	r       io.Reader
 	scanner *bufio.Scanner
 }
 
 func NewDecoder(r io.Reader) *Decoder {
 	scanner := bufio.NewScanner(r)
-	return &Decoder{r, scanner}
+	return &Decoder{scanner}
 }
 
-func (d *Decoder) Decode(msg *Msg) error {
+func (d *Decoder) Decode(msg *Msg) (err error) {
 
 	for d.scanner.Scan() {
 		msg.Reset()
 		copy(d.scanner.Bytes(), msg.Data)
-		msg.parseCmd()
+		err = msg.parseAll()
+		if err != nil {
+			return err
+		}
 	}
 
 	if d.scanner.Err() != nil {
