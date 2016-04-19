@@ -20,12 +20,13 @@ type Msg struct {
 	user     []byte
 	host     []byte
 	cmd      []byte
-	params   [][]byte
+	params   [16][]byte
 	trailing []byte
 
 	prefixParsed bool
 	paramsParsed bool
 	index        int
+	paramsCount  int
 }
 
 // Prefix
@@ -58,7 +59,7 @@ func (m *Msg) IsServer() bool {
 
 func (m *Msg) Params() [][]byte {
 	m.parseParams()
-	return m.params
+	return m.params[:]
 }
 
 func (m *Msg) Trailing() []byte {
@@ -153,6 +154,7 @@ func (m *Msg) parseParams() (err error) {
 	}
 
 	var n int
+	m.paramsCount = 0
 	b := m.Data[m.index:]
 	// find trailing
 	n = bytes.IndexByte(b, prefixSymbol)
@@ -168,11 +170,13 @@ func (m *Msg) parseParams() (err error) {
 		if n < 0 {
 			break
 		}
+
 		if n == 0 {
 			b = b[1:]
 		} else {
-			m.params = append(m.params, b[:n])
+			m.params[m.paramsCount] = b[:n]
 			b = b[n:]
+			m.paramsCount += 1
 		}
 	}
 
@@ -200,11 +204,15 @@ func (m *Msg) Reset() {
 	m.Data = nil
 	m.prefix = nil
 	m.cmd = nil
-	m.params = nil
 	m.name = nil
 	m.user = nil
 	m.host = nil
 	m.trailing = nil
 	m.paramsParsed = false
 	m.prefixParsed = false
+
+	for i := 0; i < m.paramsCount; i++ {
+		m.params[i] = nil
+	}
+	m.paramsCount = 0
 }

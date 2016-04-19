@@ -33,7 +33,7 @@ var messageTests = [...]*struct {
 			name:     s2b("Trillian"),
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("cm22.eng.umd.edu")},
+			params:   [16][]byte{s2b("cm22.eng.umd.edu")},
 		},
 		false,
 		true,
@@ -45,7 +45,7 @@ var messageTests = [...]*struct {
 			name:     s2b("WiZ"),
 			user:     s2b("jto"),
 			host:     s2b("tolsun.oulu.fi"),
-			params:   [][]byte{s2b("#playzone")},
+			params:   [16][]byte{s2b("#playzone")},
 		},
 		true,
 		false,
@@ -57,7 +57,7 @@ var messageTests = [...]*struct {
 			name:     s2b("WiZ"),
 			user:     s2b("jto"),
 			host:     s2b("tolsun.oulu.fi"),
-			params:   [][]byte{s2b("#eu-opers"), s2b("-l")},
+			params:   [16][]byte{s2b("#eu-opers"), s2b("-l")},
 		},
 		true,
 		false,
@@ -69,7 +69,7 @@ var messageTests = [...]*struct {
 			name:     nil,
 			user:     nil,
 			host:     nil,
-			params: [][]byte{s2b("&oulu"),
+			params: [16][]byte{s2b("&oulu"),
 				s2b("+b"),
 				s2b("*!*@*.edu"),
 				s2b("+e"),
@@ -86,7 +86,7 @@ var messageTests = [...]*struct {
 			name:     nil,
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("#channel")},
+			params:   [16][]byte{s2b("#channel")},
 		},
 		false,
 		true, // TODO PRIVMSG should not be server
@@ -98,7 +98,7 @@ var messageTests = [...]*struct {
 			name:     s2b("irc.vives.lan"),
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("test")},
+			params:   [16][]byte{s2b("test")},
 		},
 		false,
 		true,
@@ -110,7 +110,7 @@ var messageTests = [...]*struct {
 			name:     s2b("irc.vives.lan"),
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("test")},
+			params:   [16][]byte{s2b("test")},
 		},
 		false,
 		true,
@@ -122,7 +122,7 @@ var messageTests = [...]*struct {
 			name:     s2b("irc.vives.lan"),
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("test")},
+			params:   [16][]byte{s2b("test")},
 		},
 		false,
 		true,
@@ -134,7 +134,7 @@ var messageTests = [...]*struct {
 			name:     s2b("sorcix"),
 			user:     s2b("~sorcix"),
 			host:     s2b("sorcix.users.quakenet.org"),
-			params:   [][]byte{s2b("#viveslan")},
+			params:   [16][]byte{s2b("#viveslan")},
 		},
 		true,
 		false,
@@ -146,7 +146,7 @@ var messageTests = [...]*struct {
 			name:     s2b("sorcix"),
 			user:     s2b("~sorcix"),
 			host:     s2b("sorcix.users.quakenet.org"),
-			params:   [][]byte{s2b("#viveslan")},
+			params:   [16][]byte{s2b("#viveslan")},
 		},
 		true,
 		false,
@@ -158,7 +158,7 @@ var messageTests = [...]*struct {
 			name:     s2b("a"),
 			user:     s2b("b"),
 			host:     s2b("c"),
-			params:   [][]byte{},
+			params:   [16][]byte{},
 		},
 		true,
 		false,
@@ -170,7 +170,7 @@ var messageTests = [...]*struct {
 			name:     s2b("a"),
 			user:     s2b("b"),
 			host:     nil,
-			params:   [][]byte{},
+			params:   [16][]byte{},
 		},
 		false,
 		false,
@@ -182,7 +182,7 @@ var messageTests = [...]*struct {
 			name:     s2b("a"),
 			user:     nil,
 			host:     s2b("c"),
-			params:   [][]byte{},
+			params:   [16][]byte{},
 		},
 		false,
 		false,
@@ -194,7 +194,7 @@ var messageTests = [...]*struct {
 			name:     s2b("nick"),
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("$@")},
+			params:   [16][]byte{s2b("$@")},
 		},
 		false,
 		true, // TODO
@@ -206,7 +206,7 @@ var messageTests = [...]*struct {
 			name:     nil,
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("$@"), s2b("param")},
+			params:   [16][]byte{s2b("$@"), s2b("param")},
 		},
 		false,
 		true,
@@ -218,7 +218,7 @@ var messageTests = [...]*struct {
 			name:     nil,
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("#foo")},
+			params:   [16][]byte{s2b("#foo")},
 		},
 		false,
 		true,
@@ -230,7 +230,7 @@ var messageTests = [...]*struct {
 			name:     s2b("name"),
 			user:     s2b("user"),
 			host:     s2b("example.org"),
-			params:   [][]byte{s2b("#test")},
+			params:   [16][]byte{s2b("#test")},
 		},
 		true,
 		false,
@@ -338,5 +338,50 @@ func TestMsgHostMask(t *testing.T) {
 		if err != nil || m.IsHostMask() != z.hostmask {
 			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
+	}
+}
+func BenchmarkParseMessage_short(b *testing.B) {
+	src := s2b("COMMAND arg1 :Message\r\n")
+	m := new(Msg)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Data = src
+		m.ParseAll()
+		m.Reset()
+	}
+}
+
+func BenchmarkParseMessage_medium(b *testing.B) {
+	src := s2b(":Namename COMMAND arg6 arg7 :Message message message\r\n")
+	m := new(Msg)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Data = src
+		m.ParseAll()
+		m.Reset()
+	}
+}
+func BenchmarkParseMessage_long(b *testing.B) {
+	src := s2b(":Namename!username@hostname COMMAND arg1 arg2 arg3 arg4 arg5 arg6 arg7 :Message message message message message\r\n")
+	m := new(Msg)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Data = src
+		m.ParseAll()
+		m.Reset()
+	}
+}
+
+var params [][]byte
+
+func BenchmarkParamsAlloc(b *testing.B) {
+	src := s2b(":Namename!username@hostname COMMAND arg1 arg2 arg3 arg4 arg5 arg6 arg7 :Message message message message message\r\n")
+	m := new(Msg)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		m.Data = src
+		m.PeekCmd()
+		params = m.Params()
+		m.Reset()
 	}
 }
