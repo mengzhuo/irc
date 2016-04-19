@@ -206,11 +206,49 @@ var messageTests = [...]*struct {
 			name:     nil,
 			user:     nil,
 			host:     nil,
-			params:   [][]byte{s2b("$@"), s2b(""), s2b("param")},
+			params:   [][]byte{s2b("$@"), s2b("param")},
 		},
 		false,
+		true,
+	},
+	{
+		"TOPIC #foo",
+		&Msg{cmd: s2b("TOPIC"),
+			trailing: nil,
+			name:     nil,
+			user:     nil,
+			host:     nil,
+			params:   [][]byte{s2b("#foo")},
+		},
+		false,
+		true,
+	},
+	{
+		":name!user@example.org PRIVMSG #test :Message with spaces at the end!  ",
+		&Msg{cmd: s2b("PRIVMSG"),
+			trailing: s2b("Message with spaces at the end!  "),
+			name:     s2b("name"),
+			user:     s2b("user"),
+			host:     s2b("example.org"),
+			params:   [][]byte{s2b("#test")},
+		},
+		true,
 		false,
 	},
+}
+
+func TestInvaildMsg(t *testing.T) {
+	invalid := []string{
+		": PRIVMSG test :Invalid message with empty prefix.",
+		":  PRIVMSG test :Invalid message with space prefix",
+	}
+	for _, s := range invalid {
+		m, err := NewMsg(s2b(s))
+		if err == nil || m.Cmd() != nil {
+			t.Error(s, "is valid")
+		}
+
+	}
 }
 
 func TestMsgCmd(t *testing.T) {

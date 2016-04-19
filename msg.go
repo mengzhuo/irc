@@ -79,6 +79,10 @@ func NewMsg(b []byte) (m *Msg, err error) {
 
 func (m *Msg) PeekCmd() (err error) {
 
+	if m.index != 0 {
+		return
+	}
+
 	var n int
 	b := m.Data
 
@@ -87,11 +91,17 @@ func (m *Msg) PeekCmd() (err error) {
 		if n <= 0 {
 			err = errors.New("can't get cmd")
 			return
-		} else {
-			m.prefix = b[1:n]
-			m.index = n
-			b = b[n+1:]
 		}
+		if n == 1 {
+			err = errors.New("prefix is empty")
+			return
+
+		}
+
+		m.prefix = b[1:n]
+		m.index = n
+		b = b[n+1:]
+
 	}
 
 	n = bytes.IndexByte(b, space)
@@ -151,20 +161,19 @@ func (m *Msg) parseParams() (err error) {
 		n = len(b) - 1
 	} else {
 		m.trailing = b[n+1:]
-		if b[0] == space {
-			b = b[1:n]
-		} else {
-			b = b[:n]
-		}
+		b = b[:n]
 	}
-
 	for {
 		n = bytes.IndexByte(b, space)
 		if n < 0 {
 			break
 		}
-		m.params = append(m.params, b[:n])
-		b = b[n+1:]
+		if n == 0 {
+			b = b[1:]
+		} else {
+			m.params = append(m.params, b[:n])
+			b = b[n:]
+		}
 	}
 
 	m.paramsParsed = true
