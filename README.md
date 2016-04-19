@@ -4,8 +4,9 @@ IRC
 Fast IRC decode/encode library with zero allocation
 
 This project is inspired by 
-    * https://github.com/sorcix/irc
-    * https://github.com/valyala/fasthttp
+
+* https://github.com/sorcix/irc
+* https://github.com/valyala/fasthttp
 
 
 ### Benchmarks
