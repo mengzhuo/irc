@@ -256,7 +256,7 @@ func TestMsgCmd(t *testing.T) {
 		m, err := NewMsg(s2b(z.rawMsg))
 		m.ParseAll()
 		p := z.parsed
-		if err != nil || !bytes.Equal(m.cmd, p.cmd) {
+		if err != nil || !bytes.Equal(m.Cmd(), p.cmd) {
 			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
@@ -267,7 +267,7 @@ func TestMsgPrefixName(t *testing.T) {
 		m, err := NewMsg(s2b(z.rawMsg))
 		m.ParseAll()
 		p := z.parsed
-		if err != nil || !bytes.Equal(m.name, p.name) {
+		if err != nil || !bytes.Equal(m.Name(), p.name) {
 			t.Errorf("failed:%s\nparsed:%s\nm=%s p=%s", z.rawMsg, m.String(),
 				m.name, p.name)
 		}
@@ -279,7 +279,7 @@ func TestMsgUser(t *testing.T) {
 		m, err := NewMsg(s2b(z.rawMsg))
 		m.ParseAll()
 		p := z.parsed
-		if err != nil || !bytes.Equal(m.user, p.user) {
+		if err != nil || !bytes.Equal(m.User(), p.user) {
 			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
@@ -291,7 +291,7 @@ func TestMsgHost(t *testing.T) {
 		m, err := NewMsg(s2b(z.rawMsg))
 		m.ParseAll()
 		p := z.parsed
-		if err != nil || !bytes.Equal(m.host, p.host) {
+		if err != nil || !bytes.Equal(m.Host(), p.host) {
 			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}
@@ -301,7 +301,7 @@ func TestMsgTrailing(t *testing.T) {
 		m, err := NewMsg(s2b(z.rawMsg))
 		m.ParseAll()
 		p := z.parsed
-		if err != nil || !bytes.Equal(m.trailing, p.trailing) {
+		if err != nil || !bytes.Equal(m.Trailing(), p.trailing) {
 			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
 		}
 	}

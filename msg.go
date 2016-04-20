@@ -36,9 +36,11 @@ func (m *Msg) makePrefix() {
 		m.prefix = m.name
 	}
 	if m.user != nil {
+		m.prefix = append(m.prefix, userSymbol)
 		m.prefix = append(m.prefix, m.user...)
 	}
 	if m.host != nil {
+		m.prefix = append(m.prefix, hostSymbol)
 		m.prefix = append(m.prefix, m.host...)
 	}
 }
@@ -155,10 +157,6 @@ func (m *Msg) PeekCmd() (err error) {
 
 	if m.hasPrefix() {
 		n = bytes.IndexByte(b, space)
-		if n <= 0 {
-			err = errors.New("can't get cmd")
-			return
-		}
 		if n == 1 {
 			err = errors.New("prefix is empty")
 			return
