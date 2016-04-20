@@ -2,6 +2,7 @@ package irc
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 )
 
@@ -350,6 +351,17 @@ func TestMsgHostMask(t *testing.T) {
 		}
 	}
 }
+
+func TestMsgString(t *testing.T) {
+	for _, z := range messageTests {
+		m, err := NewMsg(s2b(z.rawMsg))
+		m.ParseAll()
+		if err != nil || strings.HasPrefix(m.String(), "CMD: ") {
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
+		}
+	}
+}
+
 func TestSetCmd(t *testing.T) {
 	m := new(Msg)
 	m.SetCmd(s2b("XXX"))
