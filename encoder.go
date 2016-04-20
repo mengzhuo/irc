@@ -20,11 +20,11 @@ func NewEncoder(w io.Writer) *Encoder {
 		&sync.Mutex{}}
 }
 
-func (e *Encoder) AppendByte(b byte) {
+func (e *Encoder) appendByte(b byte) {
 	e.buf = append(e.buf, b)
 }
 
-func (e *Encoder) Append(p []byte) {
+func (e *Encoder) append(p []byte) {
 	e.buf = append(e.buf, p...)
 }
 
@@ -39,29 +39,29 @@ func (e *Encoder) Encode(msg *Msg) (n int, err error) {
 	}
 
 	if msg.prefix != nil {
-		e.AppendByte(prefixSymbol)
-		e.Append(msg.prefix)
-		e.AppendByte(space)
+		e.appendByte(prefixSymbol)
+		e.append(msg.prefix)
+		e.appendByte(space)
 	}
 
-	e.Append(msg.cmd)
+	e.append(msg.cmd)
 
 	if msg.paramsCount != 0 {
-		e.AppendByte(space)
+		e.appendByte(space)
 		for i := 0; i < msg.paramsCount; i++ {
-			e.Append(msg.params[i])
+			e.append(msg.params[i])
 			if i != msg.paramsCount-1 {
-				e.AppendByte(space)
+				e.appendByte(space)
 			}
 		}
 	}
 
 	if msg.trailing != nil {
-		e.AppendByte(space)
-		e.AppendByte(prefixSymbol)
-		e.Append(msg.trailing)
+		e.appendByte(space)
+		e.appendByte(prefixSymbol)
+		e.append(msg.trailing)
 	}
 
-	e.Append([]byte("\r\n"))
+	e.append([]byte("\r\n"))
 	return e.w.Write(e.buf)
 }
