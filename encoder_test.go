@@ -29,6 +29,16 @@ func TestEncode(t *testing.T) {
 	}
 }
 
+func ExampleEncoder() {
+	buf := bytes.NewBuffer([]byte{})
+	enc := NewEncoder(buf)
+	msg := new(Msg)
+	msg.SetCmd([]byte("NICK"))
+	msg.SetParams([]byte("hello world"))
+	_, _ = enc.Encode(msg)
+	fmt.Println(buf.String()) // NICK
+}
+
 func TestEncodeEmptyMsg(t *testing.T) {
 	msg := new(Msg)
 	msg.SetParams(bytes.Split(s2b("arg1 arg2 arg3 arg4 arg5 arg6 arg7"), []byte{space})...)
