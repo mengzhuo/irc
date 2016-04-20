@@ -3,18 +3,22 @@ package irc
 import (
 	"bufio"
 	"io"
+	"sync"
 )
 
 type Decoder struct {
 	scanner *bufio.Scanner
+	*sync.Mutex
 }
 
 func NewDecoder(r io.Reader) *Decoder {
 	scanner := bufio.NewScanner(r)
-	return &Decoder{scanner}
+	return &Decoder{scanner, &sync.Mutex{}}
 }
 
 func (d *Decoder) Decode(msg *Msg) (err error) {
+	d.Lock()
+	defer d.Unlock()
 
 	for d.scanner.Scan() {
 		msg.Reset()
