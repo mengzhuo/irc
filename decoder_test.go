@@ -8,7 +8,7 @@ import (
 
 var target = []byte(
 	`:Namename!username@hostname COMMAND arg1 arg2 arg3 arg4 arg5 arg6 arg7 :Message message message message message\r\n
-:Namename!username@hostname COMMAND arg1 arg2 arg3 arg4 arg5 arg6 arg7 :Message message message message message\r\n`)
+: \r\n`)
 
 func TestDecode(t *testing.T) {
 	var err error
@@ -19,11 +19,10 @@ func TestDecode(t *testing.T) {
 		msg := new(Msg)
 		err = dec.Decode(msg)
 
-		if err != nil {
-			t.Error(err)
+		if i == 0 && err != nil && !bytes.Equal(msg.Cmd(), []byte("COMMAND")) {
+			t.Error(msg)
 		}
-
-		if !bytes.Equal(msg.Cmd(), []byte("COMMAND")) {
+		if i == 1 && err == nil {
 			t.Error(msg)
 		}
 
