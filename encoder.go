@@ -6,6 +6,8 @@ import (
 	"sync"
 )
 
+var DefaultEncoderBufferrSize = 1024
+
 type Encoder struct {
 	w   io.Writer
 	buf []byte
@@ -14,7 +16,7 @@ type Encoder struct {
 
 func NewEncoder(w io.Writer) *Encoder {
 	return &Encoder{w,
-		make([]byte, 1024),
+		make([]byte, DefaultEncoderBufferrSize),
 		&sync.Mutex{}}
 }
 
