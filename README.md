@@ -1,6 +1,7 @@
 IRC
 ======================
 [![Build Status](https://travis-ci.org/mengzhuo/irc.svg?branch=master)](https://travis-ci.org/mengzhuo/irc)
+[![GoDoc](https://godoc.org/github.com/mengzhuo/irc?status.svg)](http://godoc.org/github.com/mengzhuo/irc)
 
 Fast IRC decode/encode library with zero allocation
 
