@@ -342,6 +342,17 @@ func TestMsgServer(t *testing.T) {
 	}
 }
 
+func TestMsgReset(t *testing.T) {
+	for _, z := range messageTests {
+		m, err := NewMsg(s2b(z.rawMsg))
+		m.ParseAll()
+		m.Reset()
+		if err != nil || m.params[0] != nil {
+			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
+		}
+	}
+}
+
 func TestMsgHostMask(t *testing.T) {
 	for _, z := range messageTests {
 		m, err := NewMsg(s2b(z.rawMsg))
