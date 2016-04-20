@@ -89,7 +89,7 @@ func (m *Msg) IsServer() bool {
 
 func (m *Msg) Params() [][]byte {
 	m.parseParams()
-	return m.params[:]
+	return m.params[:m.paramsCount]
 }
 
 func (m *Msg) SetParams(params ...[]byte) (err error) {
@@ -230,18 +230,23 @@ func (m *Msg) parseParams() (err error) {
 		b = b[:n]
 	}
 	for {
-		n = bytes.IndexByte(b, space)
-		if n < 0 {
+		if len(b) == 0 {
 			break
 		}
-
+		n = bytes.IndexByte(b, space)
 		if n == 0 {
 			b = b[1:]
+			continue
+		}
+		if n < 0 {
+			m.params[m.paramsCount] = b[:]
+			m.paramsCount += 1
+			break
 		} else {
 			m.params[m.paramsCount] = b[:n]
 			b = b[n:]
-			m.paramsCount += 1
 		}
+		m.paramsCount += 1
 	}
 
 	m.paramsParsed = true

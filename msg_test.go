@@ -146,7 +146,7 @@ var messageTests = [...]*struct {
 			name:     s2b("sorcix"),
 			user:     s2b("~sorcix"),
 			host:     s2b("sorcix.users.quakenet.org"),
-			params:   [16][]byte{s2b("#viveslan")},
+			params:   [16][]byte{s2b("midnightfox")},
 		},
 		true,
 		false,
@@ -313,10 +313,20 @@ func TestMsgParams(t *testing.T) {
 		m.ParseAll()
 		p := z.parsed
 		if err != nil {
-			for i := 0; i < len(p.params); i++ {
-				bytes.Equal(p.params[i], m.params[i])
-			}
 			t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
+		}
+		var j int
+		var zz []byte
+		for j, zz = range z.parsed.params {
+			if zz == nil {
+				break
+			}
+		}
+		for i := 0; i < j; i++ {
+			if !bytes.Equal(m.Params()[i], p.params[i]) {
+				t.Log(z, "i=", i, "j=", j, m.Params()[i], p.params[i])
+				t.Errorf("failed:%s\nparsed:%s", z.rawMsg, m.String())
+			}
 		}
 	}
 }
@@ -340,6 +350,31 @@ func TestMsgHostMask(t *testing.T) {
 		}
 	}
 }
+
+func TestSetHost(t *testing.T) {
+	m := new(Msg)
+	m.SetHost(s2b("XXX"))
+	if string(m.host) != "XXX" {
+		t.Error(m.host, "!=", "XXX")
+	}
+}
+
+func TestSetUser(t *testing.T) {
+	m := new(Msg)
+	m.SetUser(s2b("XXX"))
+	if string(m.user) != "XXX" {
+		t.Error(m.user, "!=", "XXX")
+	}
+}
+
+func TestSetName(t *testing.T) {
+	m := new(Msg)
+	m.SetName(s2b("XXX"))
+	if string(m.name) != "XXX" {
+		t.Error(m.name, "!=", "XXX")
+	}
+}
+
 func BenchmarkParseMessage_short(b *testing.B) {
 	src := s2b("COMMAND arg1 :Message\r\n")
 	m := new(Msg)

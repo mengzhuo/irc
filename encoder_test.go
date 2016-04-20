@@ -29,6 +29,19 @@ func TestEncode(t *testing.T) {
 	}
 }
 
+func TestEncodeEmptyMsg(t *testing.T) {
+	msg := new(Msg)
+	msg.SetParams(bytes.Split(s2b("arg1 arg2 arg3 arg4 arg5 arg6 arg7"), []byte{space})...)
+	buf := bytes.NewBuffer([]byte{})
+	enc := NewEncoder(buf)
+	n, err := enc.Encode(msg)
+
+	if err == nil {
+		t.Error(n, err, fmt.Sprintf("+%x+", buf.String()))
+	}
+
+}
+
 func BenchmarkEncoder(b *testing.B) {
 	msg := new(Msg)
 	name := s2b("Namename")
