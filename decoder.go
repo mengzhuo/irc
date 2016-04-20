@@ -16,6 +16,7 @@ func NewDecoder(r io.Reader) *Decoder {
 	return &Decoder{scanner, &sync.Mutex{}}
 }
 
+// Decode msg from reader
 func (d *Decoder) Decode(msg *Msg) (err error) {
 	d.Lock()
 	defer d.Unlock()

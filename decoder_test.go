@@ -2,6 +2,7 @@ package irc
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -27,6 +28,14 @@ func TestDecode(t *testing.T) {
 		}
 
 	}
+}
+
+func ExampleDecoder() {
+	buf := bytes.NewBuffer([]byte(`:hello NICK world :irc`))
+	dec := NewDecoder(buf)
+	msg := new(Msg)
+	_ = dec.Decode(msg)
+	fmt.Println(msg.Cmd()) // NICK
 }
 
 func BenchmarkDecoder(b *testing.B) {

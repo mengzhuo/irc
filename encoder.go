@@ -28,6 +28,7 @@ func (e *Encoder) append(p []byte) {
 	e.buf = append(e.buf, p...)
 }
 
+// Encode msg into writer
 func (e *Encoder) Encode(msg *Msg) (n int, err error) {
 	e.Lock()
 	defer e.Unlock()

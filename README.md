@@ -11,7 +11,7 @@ This project is inspired by
 * https://github.com/valyala/fasthttp
 
 
-### Benchmarks
+### Benchmarks vs sorcix/irc
 ```
 benchmark                          old ns/op     new ns/op     delta
 BenchmarkParseMessage_short-4      313           170           -45.69%
