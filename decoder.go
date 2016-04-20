@@ -31,9 +31,5 @@ func (d *Decoder) Decode(msg *Msg) (err error) {
 		break
 	}
 
-	if d.scanner.Err() != nil {
-		return d.scanner.Err()
-	}
-
-	return nil
+	return d.scanner.Err()
 }

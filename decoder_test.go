@@ -1,6 +1,7 @@
 package irc
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"testing"
@@ -14,7 +15,7 @@ func TestDecode(t *testing.T) {
 	var err error
 	buf := bytes.NewBuffer(target)
 	dec := NewDecoder(buf)
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 3; i++ {
 
 		msg := new(Msg)
 		err = dec.Decode(msg)
@@ -25,7 +26,10 @@ func TestDecode(t *testing.T) {
 		if i == 1 && err == nil {
 			t.Error(msg)
 		}
-
+		if i == 2 && err != nil {
+			// EOF
+			t.Error(msg, err)
+		}
 	}
 }
 
