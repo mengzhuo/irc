@@ -350,6 +350,13 @@ func TestMsgHostMask(t *testing.T) {
 		}
 	}
 }
+func TestSetCmd(t *testing.T) {
+	m := new(Msg)
+	m.SetCmd(s2b("XXX"))
+	if string(m.Cmd()) != "XXX" {
+		t.Error(m.Cmd(), "!=", "XXX")
+	}
+}
 
 func TestSetHost(t *testing.T) {
 	m := new(Msg)
@@ -372,6 +379,13 @@ func TestSetName(t *testing.T) {
 	m.SetName(s2b("XXX"))
 	if string(m.name) != "XXX" {
 		t.Error(m.name, "!=", "XXX")
+	}
+}
+func TestSetTrailing(t *testing.T) {
+	m := new(Msg)
+	m.SetTrailing(s2b("XXX"))
+	if string(m.Trailing()) != "XXX" {
+		t.Error(m.trailing, "!=", "XXX")
 	}
 }
 
@@ -418,5 +432,46 @@ func BenchmarkParamsAlloc(b *testing.B) {
 		m.PeekCmd()
 		params = m.Params()
 		m.Reset()
+	}
+}
+
+func TestAppendParams(t *testing.T) {
+	m := new(Msg)
+	m.AppendParams(s2b("#ERR"))
+	if m.paramsCount != 1 || string(m.params[0]) != "#ERR" {
+		t.Error(m)
+	}
+}
+
+func TestAppendParamsOverflow(t *testing.T) {
+	n := bytes.Split(bytes.Repeat([]byte(" param"), 16)[1:], []byte{space})
+	m := new(Msg)
+	m.prefixParsed = true
+	m.SetCmd([]byte("hehe"))
+	if err := m.SetParams(n...); err != nil || m.paramsCount != 16 {
+		t.Error(err, n, m)
+	}
+	if err := m.AppendParams([]byte("$")); err == nil {
+		t.Error(err, m, n)
+	}
+}
+
+func TestSetParams(t *testing.T) {
+	m := new(Msg)
+	m.SetParams(s2b("1"), s2b("2"))
+	if m.paramsCount != 2 || string(m.params[0]) != "1" || string(m.params[1]) != "2" {
+		t.Error(m)
+	}
+
+}
+
+func TestSetParamsOver(t *testing.T) {
+	n := bytes.Split(bytes.Repeat([]byte("param "), 17), []byte{space})
+	m := new(Msg)
+	m.prefixParsed = true
+	m.SetCmd([]byte("hehe"))
+	err := m.SetParams(n...)
+	if err == nil || m.params[0] != nil {
+		t.Error(m, n)
 	}
 }
