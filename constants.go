@@ -6,39 +6,39 @@ package irc
 
 // Various prefixes extracted from RFC1459.
 const (
-	Channel     = '#' // Normal channel
-	Distributed = '&' // Distributed channel
+	Channel     byte = '#' // Normal channel
+	Distributed byte = '&' // Distributed channel
 
-	Owner        = '~' // Channel owner +q (non-standard)
-	Admin        = '&' // Channel admin +a (non-standard)
-	Operator     = '@' // Channel operator +o
-	HalfOperator = '%' // Channel half operator +h (non-standard)
-	Voice        = '+' // User has voice +v
+	Owner        byte = '~' // Channel owner +q (non-standard)
+	Admin        byte = '&' // Channel admin +a (non-standard)
+	Operator     byte = '@' // Channel operator +o
+	HalfOperator byte = '%' // Channel half operator +h (non-standard)
+	Voice        byte = '+' // User has voice +v
 )
 
 // User modes as defined by RFC1459 section 4.2.3.2.
 const (
-	UserModeInvisible     = 'i' // User is invisible
-	UserModeServerNotices = 's' // User wants to receive server notices
-	UserModeWallops       = 'w' // User wants to receive Wallops
-	UserModeOperator      = 'o' // Server operator
+	UserModeInvisible     byte = 'i' // User is invisible
+	UserModeServerNotices byte = 's' // User wants to receive server notices
+	UserModeWallops       byte = 'w' // User wants to receive Wallops
+	UserModeOperator      byte = 'o' // Server operator
 )
 
 // Channel modes as defined by RFC1459 section 4.2.3.1
 const (
-	ModeOperator   = 'o' // Operator privileges
-	ModeVoice      = 'v' // Ability to speak on a moderated channel
-	ModePrivate    = 'p' // Private channel
-	ModeSecret     = 's' // Secret channel
-	ModeInviteOnly = 'i' // Users can't join without invite
-	ModeTopic      = 't' // Topic can only be set by an operator
-	ModeModerated  = 'm' // Only voiced users and operators can talk
-	ModeLimit      = 'l' // User limit
-	ModeKey        = 'k' // Channel password
+	ModeOperator   byte = 'o' // Operator privileges
+	ModeVoice      byte = 'v' // Ability to speak on a moderated channel
+	ModePrivate    byte = 'p' // Private channel
+	ModeSecret     byte = 's' // Secret channel
+	ModeInviteOnly byte = 'i' // Users can't join without invite
+	ModeTopic      byte = 't' // Topic can only be set by an operator
+	ModeModerated  byte = 'm' // Only voiced users and operators can talk
+	ModeLimit      byte = 'l' // User limit
+	ModeKey        byte = 'k' // Channel password
 
-	ModeOwner        = 'q' // Owner privileges (non-standard)
-	ModeAdmin        = 'a' // Admin privileges (non-standard)
-	ModeHalfOperator = 'h' // Half-operator privileges (non-standard)
+	ModeOwner        byte = 'q' // Owner privileges (non-standard)
+	ModeAdmin        byte = 'a' // Admin privileges (non-standard)
+	ModeHalfOperator byte = 'h' // Half-operator privileges (non-standard)
 )
 
 // IRC commands extracted from RFC2812 section 3 and RFC2813 section 4.
