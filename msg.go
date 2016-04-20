@@ -30,9 +30,27 @@ type Msg struct {
 }
 
 // Prefix
+
+func (m *Msg) makePrefix() {
+	if m.name != nil {
+		m.prefix = m.name
+	}
+	if m.user != nil {
+		m.prefix = append(m.prefix, m.user...)
+	}
+	if m.host != nil {
+		m.prefix = append(m.prefix, m.host...)
+	}
+}
+
 func (m *Msg) Name() []byte {
 	m.parsePrefix()
 	return m.name
+}
+
+func (m *Msg) SetName(p []byte) {
+	m.name = p
+	m.makePrefix()
 }
 
 func (m *Msg) User() []byte {
@@ -40,9 +58,19 @@ func (m *Msg) User() []byte {
 	return m.user
 }
 
+func (m *Msg) SetUser(p []byte) {
+	m.user = p
+	m.makePrefix()
+}
+
 func (m *Msg) Host() []byte {
 	m.parsePrefix()
 	return m.host
+}
+
+func (m *Msg) SetHost(p []byte) {
+	m.host = p
+	m.makePrefix()
 }
 
 func (m *Msg) IsHostMask() bool {
@@ -62,13 +90,51 @@ func (m *Msg) Params() [][]byte {
 	return m.params[:]
 }
 
+func (m *Msg) SetParams(params ...[]byte) (err error) {
+
+	if len(params) > 16 {
+		err = errors.New("Too many params")
+		return
+	}
+
+	for i, p := range params {
+		m.params[i] = p
+	}
+	m.paramsCount = len(params)
+	m.paramsParsed = true
+
+	return
+}
+
+func (m *Msg) AppendParams(p []byte) (err error) {
+
+	if m.paramsCount >= 16 {
+		err = errors.New("Too many params")
+		return
+	}
+
+	m.params[m.paramsCount] = p
+	m.paramsCount += 1
+	m.paramsParsed = true
+	return
+}
+
 func (m *Msg) Trailing() []byte {
 	m.parseParams()
 	return m.trailing
 }
 
+func (m *Msg) SetTrailing(p []byte) {
+	m.trailing = p
+	m.paramsParsed = true
+}
+
 func (m *Msg) Cmd() []byte {
 	return m.cmd
+}
+
+func (m *Msg) SetCmd(p []byte) {
+	m.cmd = p
 }
 
 func NewMsg(b []byte) (m *Msg, err error) {
@@ -215,4 +281,5 @@ func (m *Msg) Reset() {
 		m.params[i] = nil
 	}
 	m.paramsCount = 0
+	m.index = 0
 }
