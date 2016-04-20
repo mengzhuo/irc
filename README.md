@@ -2,6 +2,7 @@ IRC
 ======================
 [![Build Status](https://travis-ci.org/mengzhuo/irc.svg?branch=master)](https://travis-ci.org/mengzhuo/irc)
 [![GoDoc](https://godoc.org/github.com/mengzhuo/irc?status.svg)](http://godoc.org/github.com/mengzhuo/irc)
+[![codecov.io](https://codecov.io/github/mengzhuo/irc/coverage.svg?branch=master)](https://codecov.io/github/mengzhuo/irc?branch=master)
 
 Fast IRC decode/encode library with zero allocation
 
@@ -12,6 +13,7 @@ This project is inspired by
 
 
 ### Benchmarks vs sorcix/irc
+Base on rMBP 4 cores CPU 8 GB memory
 ```
 benchmark                          old ns/op     new ns/op     delta
 BenchmarkParseMessage_short-4      313           170           -45.69%
