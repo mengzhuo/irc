@@ -25,7 +25,7 @@ func TestDecode(t *testing.T) {
 		if i == 1 && err == nil {
 			t.Error(msg)
 		}
-		if i == 2 && err != nil {
+		if i == 2 && (msg.cmd != nil || err != nil) {
 			// EOF
 			t.Error(msg, err)
 		}
@@ -41,6 +41,8 @@ func ExampleDecoder() {
 }
 
 func BenchmarkDecoder(b *testing.B) {
+	target := []byte(
+		`:Namename!username@hostname COMMAND arg1 arg2 arg3 arg4 arg5 arg6 arg7 :Message message message message message\r\n`)
 	buf := bytes.NewBuffer(target)
 	dec := NewDecoder(buf)
 	msg := new(Msg)
