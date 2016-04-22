@@ -7,13 +7,13 @@ import (
 )
 
 type Decoder struct {
-	scanner *bufio.Scanner
+	rdr *bufio.Reader
 	*sync.Mutex
 }
 
 func NewDecoder(r io.Reader) *Decoder {
-	scanner := bufio.NewScanner(r)
-	return &Decoder{scanner, &sync.Mutex{}}
+	rdr := bufio.NewReader(r)
+	return &Decoder{rdr, &sync.Mutex{}}
 }
 
 // Decode msg from reader
@@ -21,15 +21,13 @@ func (d *Decoder) Decode(msg *Msg) (err error) {
 	d.Lock()
 	defer d.Unlock()
 
-	for d.scanner.Scan() {
-		msg.Reset()
-		msg.Data = d.scanner.Bytes()[:]
-		err = msg.PeekCmd()
-		if err != nil {
-			return err
-		}
-		break
+	var line []byte
+	line, _, err = d.rdr.ReadLine()
+	if err != nil {
+		return
 	}
 
-	return d.scanner.Err()
+	msg.Reset()
+	msg.Data = line[:]
+	return msg.PeekCmd()
 }

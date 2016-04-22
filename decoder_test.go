@@ -3,6 +3,7 @@ package irc
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"testing"
 )
 
@@ -25,7 +26,7 @@ func TestDecode(t *testing.T) {
 		if i == 1 && err == nil {
 			t.Error(msg)
 		}
-		if i == 2 && (msg.cmd != nil || err != nil) {
+		if i == 2 && err != io.EOF {
 			// EOF
 			t.Error(msg, err)
 		}
@@ -41,16 +42,15 @@ func ExampleDecoder() {
 }
 
 func BenchmarkDecoder(b *testing.B) {
-	target := []byte(
-		`:Namename!username@hostname COMMAND arg1 arg2 arg3 arg4 arg5 arg6 arg7 :Message message message message message\r\n`)
-	buf := bytes.NewBuffer(target)
+	buf := bytes.NewBuffer(bytes.Repeat(target, 9999))
 	dec := NewDecoder(buf)
 	msg := new(Msg)
 	b.ResetTimer()
+	var err error
 	for i := 0; i < b.N; i++ {
-		err := dec.Decode(msg)
-		if err != nil || msg.Cmd() == nil {
-			b.Fatal(err, msg, msg.Data)
+		err = dec.Decode(msg)
+		if err != nil && msg.Cmd() != nil {
+			b.Error(err, msg.Data)
 		}
 	}
 }
