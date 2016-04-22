@@ -28,6 +28,14 @@ var messageTests = [...]*struct {
 		false,
 	},
 	{
+		"PING hi",
+		&Msg{cmd: s2b("PING"),
+			params: [16][]byte{s2b("hi")},
+		},
+		false,
+		true,
+	},
+	{
 		":Trillian SQUIT cm22.eng.umd.edu :Server out of control",
 		&Msg{cmd: s2b("SQUIT"),
 			trailing: s2b("Server out of control"),
